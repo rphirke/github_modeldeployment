@@ -12,9 +12,8 @@ jobs:
     container: docker://dvcorg/cml-py3:latest
    
     steps:
-      # 1. Replaced Node-dependent actions/checkout with native Git checkout commands
-      # This completely eliminates Node.js from the entire execution loop
-      name: Clone repository code
+      # Fixed syntax: Added the missing dash to make this a valid step
+      - name: Clone repository code
         env:
           REPO_URL: "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git"
         run: |
