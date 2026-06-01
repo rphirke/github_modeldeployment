@@ -6,21 +6,19 @@ permissions:
 on:
   - push
 
+# Forces the runner engine to bypass the Node.js deprecation restriction
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
 jobs:
   run:
     runs-on: ubuntu-latest
+    # This instructs GitHub to run all steps directly inside the official CML environment
+    container: docker://dvcorg/cml-py3:latest
    
     steps:
-      # 1. Upgraded to v3 to run on Node.js 24 and completely bypass the npm install crash
-      - uses: iterative/setup-cml@v3
-
-      # 2. Upgraded to v4 to use modern Node.js versions and avoid runner deprecations
+      # Explicitly using v4 to ensure native compatibility inside the Docker run block
       - uses: actions/checkout@v4
-
-      # 3. Explicitly setup Python to ensure clean environment execution
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
 
       - name: Train model
         env:
