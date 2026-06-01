@@ -6,19 +6,19 @@ permissions:
 on:
   - push
 
-# Forces the runner engine to bypass the Node.js deprecation restriction
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
-
 jobs:
   run:
     runs-on: ubuntu-latest
-    # This instructs GitHub to run all steps directly inside the official CML environment
     container: docker://dvcorg/cml-py3:latest
    
     steps:
-      # Explicitly using v4 to ensure native compatibility inside the Docker run block
-      - uses: actions/checkout@v4
+      # 1. Replaced Node-dependent actions/checkout with native Git checkout commands
+      # This completely eliminates Node.js from the entire execution loop
+      name: Clone repository code
+        env:
+          REPO_URL: "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git"
+        run: |
+          git clone --depth 1 --branch ${{ github.ref_name }} $REPO_URL .
 
       - name: Train model
         env:
