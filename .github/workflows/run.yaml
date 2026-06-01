@@ -8,11 +8,20 @@ on:
 
 jobs:
   run:
-    runs-on:
-      - ubuntu-latest
+    runs-on: ubuntu-latest
    
     steps:
-      - uses: actions/checkout@v3
+      # 1. Upgraded to v3 to run on Node.js 24 and completely bypass the npm install crash
+      - uses: iterative/setup-cml@v3
+
+      # 2. Upgraded to v4 to use modern Node.js versions and avoid runner deprecations
+      - uses: actions/checkout@v4
+
+      # 3. Explicitly setup Python to ensure clean environment execution
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
       - name: Train model
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -20,12 +29,12 @@ jobs:
           pip install -r requirements.txt
           python train_model.py
 
-          echo "RF and LR Model Score" >report.md
-          cat scores.txt
+          echo "RF and LR Model Score" > report.md
+          cat scores.txt >> report.md
          
-          echo "Confusion Matrix & Feature Importance">report1.md
-          echo '|[](./ConfusionMatrix.png "ConfusionMatrix")' >> report1.md
-          echo '|[](./FeatureImportance.png "FeatureImportance")' >> report1.md
+          echo -e "\nConfusion Matrix & Feature Importance" > report1.md
+          echo '![](./ConfusionMatrix.png "ConfusionMatrix")' >> report1.md
+          echo '![](./FeatureImportance.png "FeatureImportance")' >> report1.md
      
-          cat report.md report1.md >> combined_file.md
+          cat report.md report1.md > combined_file.md
           cml comment create combined_file.md
